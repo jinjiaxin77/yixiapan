@@ -1,0 +1,10 @@
+server:
+  port: 7090
+  servlet:
+    context-path: /api
+    session:
+      timeout: PT60M
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/yixiapan?serverTimezone=GMT
