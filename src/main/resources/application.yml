@@ -73,6 +73,3 @@ qq:
         info: https://graph.qq.com/user/get_user_info?access_token=%s&oauth_consumer_key=%s&openid=%s
       redirect: http://easypan.wuhancoder.com/qqlogincalback
 
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
