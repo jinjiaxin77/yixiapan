@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinjiaxin.yixiapan.mappers.UserInfoMapper">
+    <insert id="add" parameterType="com.jinjiaxin.yixiapan.entity.pojo.User">
+        insert into user_info values (#{user.userId},#{user.nickName},#{user.email},#{user.qqOpenId},#{user.qqAvatar},#{user.password},#{user.regisTime},#{user.lastLoginTime},#{user.status},#{user.useSpace},#{user.totalSpace})
+    </insert>
+    <update id="update" parameterType="com.jinjiaxin.yixiapan.entity.pojo.User">
+        update user_info
+        set user_id = #{user.userId},nick_name = #{user.nickName},email = #{user.email},qq_open_id = #{user.qqOpenId},qq_avatar = #{user.qqAvatar}, password = #{user.password},regis_time = #{user.regisTime},last_login_time = #{user.lastLoginTime}, status = #{user.status},use_space = #{user.useSpace}, total_space = #{user.totalSpace}
+    </update>
+    <delete id="deleteByUserId">
+        delete from user_info where user_id = #{userId}
+    </delete>
+    <delete id="deleteByEmail">
+        delete from user_info where email = #{email}
+    </delete>
+    <delete id="deleteByQqOpenId">
+        delete
+        from user_info
+        where qq_open_id = #{qqOpenId};
+    </delete>
+    <delete id="deleteByNickName">
+        delete
+        from user_info
+        where nick_name = #{nickName}
+    </delete>
+    <select id="selectByUserId" resultType="com.jinjiaxin.yixiapan.entity.pojo.User">
+        select * from user_info where user_id = #{userId}
+    </select>
+    <select id="selectByEmail" resultType="com.jinjiaxin.yixiapan.entity.pojo.User">
+        select * from user_info where email = #{email}
+    </select>
+    <select id="selectByQqOpenId" resultType="com.jinjiaxin.yixiapan.entity.pojo.User">
+        select * from user_info where qq_open_id = #{qqOpenId}
+    </select>
+    <select id="selectByNickName" resultType="com.jinjiaxin.yixiapan.entity.pojo.User">
+        select * from user_info where nick_name = #{nickName}
+    </select>
+
+
+</mapper>
