@@ -1,6 +1,8 @@
 package com.jinjiaxin.yixiapan.utils;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
+import org.springframework.util.DigestUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -63,5 +65,9 @@ public class StringTools {
         }
 
         return  str2;
+    }
+
+    public static String encodeByMd5(String password){
+        return isEmpty(password)?null: DigestUtils.md5DigestAsHex(password.getBytes());
     }
 }

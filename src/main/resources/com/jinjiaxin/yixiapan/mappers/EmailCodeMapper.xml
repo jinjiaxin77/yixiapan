@@ -5,8 +5,8 @@
         insert into email_code values (#{code.email},#{code.code},#{code.createTime},#{code.status})
     </insert>
     <update id="update">
-        update
-        set status = #{code.status}
+        update email_code
+        set status = 1
         where email = #{code.email} AND code = #{code.code};
     </update>
     <update id="disableEmailCode">
@@ -17,6 +17,6 @@
     <select id="selectEmailCode" resultType="com.jinjiaxin.yixiapan.entity.pojo.EmailCode">
         select *
         from email_code
-        where email = #{code.email} AND code = #{code.code};
+        where email = #{email} AND status = 0;
     </select>
 </mapper>

@@ -4,16 +4,15 @@ import com.jinjiaxin.yixiapan.annotation.GlobalInterceptor;
 import com.jinjiaxin.yixiapan.annotation.VerifyParam;
 import com.jinjiaxin.yixiapan.entity.config.AppConfig;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
-import com.jinjiaxin.yixiapan.entity.dto.CreateImageCode;
 import com.jinjiaxin.yixiapan.entity.enums.VerifyRegexEnum;
 import com.jinjiaxin.yixiapan.entity.pojo.EmailCode;
 import com.jinjiaxin.yixiapan.entity.pojo.User;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
 import com.jinjiaxin.yixiapan.mappers.EmailCodeMapper;
+import com.jinjiaxin.yixiapan.mappers.UserInfoMapper;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.service.UserInfoService;
 import com.jinjiaxin.yixiapan.utils.StringTools;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ import java.util.Date;
 public class EmailCodeServiceImpl implements EmailCodeService {
 
     @Autowired
-    private UserInfoService userInfoService;
+    private UserInfoMapper userInfoMapper;
 
     @Autowired
     private EmailCodeMapper emailCodeMapper;
@@ -52,7 +51,7 @@ public class EmailCodeServiceImpl implements EmailCodeService {
     @GlobalInterceptor(checkParams = true)
     public void sendEmailCode(@VerifyParam(required = true,regex = VerifyRegexEnum.EMAIL) String email, Integer type) {
         if(type == Constants.ZERO){
-            User user = userInfoService.getUserByEmail(email);
+            User user = userInfoMapper.selectByEmail(email);
             if(user != null){
                 throw new BusinessException("该邮箱已经注册");
             }
@@ -65,6 +64,23 @@ public class EmailCodeServiceImpl implements EmailCodeService {
         emailCodeMapper.disableEmailCode(email);
         EmailCode emailCode = new EmailCode(email,code,new Date(),Constants.ZERO);
         emailCodeMapper.add(emailCode);
+    }
+
+    @Override
+    public boolean checkCode(String email, String code) {
+        EmailCode emailCode = emailCodeMapper.selectEmailCode(email);
+        if(emailCode == null){
+            throw new BusinessException("邮箱验证码不正确");
+        }
+
+        if(System.currentTimeMillis() - emailCode.getCreateTime().getTime() > Constants.LENGTH_15*1000*60){
+            emailCodeMapper.update(emailCode);
+            throw new BusinessException("邮箱验证码失效");
+        }
+
+
+        emailCodeMapper.update(emailCode);
+        return code.equalsIgnoreCase(emailCode.getCode());
     }
 
     private void sendEmailCode(String toEmail, String code) {

@@ -10,6 +10,7 @@ import com.jinjiaxin.yixiapan.utils.StringTools;
 import com.jinjiaxin.yixiapan.utils.VerifyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -35,7 +36,7 @@ public class GlobalOperationAspect {
     private void requestInterceptor(){ }
 
     @Before("requestInterceptor()")
-    public void InterceptorDo (JoinPoint point) throws BusinessException{
+    public Object InterceptorDo (JoinPoint point) throws BusinessException{
         try{
             Object target = point.getTarget();
             Object[] arguments = point.getArgs();
@@ -44,12 +45,13 @@ public class GlobalOperationAspect {
             Method method = target.getClass().getMethod(methodName,parameterTypes);
             GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
 
-            if(interceptor == null) return ;
+            if(interceptor == null) return null;
 
-            if(interceptor.checkParams() == true){
+            if(interceptor.checkParams()){
                 validateParams(method,arguments);
             }
 
+            return null;
         }catch (BusinessException e){
             log.error("全局拦截器异常",e);
             throw e;
@@ -60,6 +62,7 @@ public class GlobalOperationAspect {
             log.error("全局拦截器异常",e);
             throw new BusinessException(ResponseCodeEnum.CODE_500);
         }
+
     }
 
     private void validateParams(Method method, Object[] arguments){
@@ -107,12 +110,14 @@ public class GlobalOperationAspect {
     private void checkValue(Object value, VerifyParam annotation){
         Boolean isEmpty = value==null;
         Integer length = value==null?0:value.toString().length();
+        log.error(annotation.max() + "," + annotation.min());
 
         if(isEmpty && annotation.required()){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
-        }else if( !isEmpty && (annotation.max() < length || annotation.min() > length)){
+        }else if( !isEmpty && ((annotation.max()!=-1 && annotation.max() < length) || (annotation.min() != -1 && annotation.min() > length))){
             throw new RuntimeException(String.valueOf(ResponseCodeEnum.CODE_600));
         }else if( !isEmpty && !StringTools.isEmpty(annotation.regex().getRegex()) && !VerifyUtils.verify(annotation.regex(),String.valueOf(value))){
+            log.error("here");
             throw new RuntimeException(String.valueOf(ResponseCodeEnum.CODE_600));
         }
     }

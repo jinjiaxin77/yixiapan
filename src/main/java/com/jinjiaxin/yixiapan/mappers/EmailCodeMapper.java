@@ -7,7 +7,7 @@ public interface EmailCodeMapper {
 
     void add(@Param("code")EmailCode code);
 
-    EmailCode selectEmailCode(@Param("email") String email, @Param("code") String code);
+    EmailCode selectEmailCode(@Param("email") String email);
 
     void update(@Param("code") EmailCode code);
 

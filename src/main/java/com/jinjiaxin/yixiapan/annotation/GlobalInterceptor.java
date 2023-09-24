@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Mapping
 public @interface GlobalInterceptor {
 
     /**

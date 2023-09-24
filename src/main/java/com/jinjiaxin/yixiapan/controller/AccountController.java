@@ -4,6 +4,8 @@ import com.jinjiaxin.yixiapan.annotation.GlobalInterceptor;
 import com.jinjiaxin.yixiapan.annotation.VerifyParam;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.CreateImageCode;
+import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
+import com.jinjiaxin.yixiapan.entity.enums.VerifyRegexEnum;
 import com.jinjiaxin.yixiapan.entity.vo.ResponseVO;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
@@ -48,10 +50,10 @@ public class AccountController extends ABaseController{
 
 	@PostMapping("/sendEmailCode")
 	@GlobalInterceptor(checkParams = true)
-	public ResponseVO sendEmailCode(HttpSession session,@VerifyParam(required = true,max = 150,min = 8) String email, @VerifyParam(required = true, max = 5, min = 5) String checkCode, @VerifyParam(required = true, max = 1, min = 1) Integer type){
+	public ResponseVO sendEmailCode(HttpSession session, @VerifyParam(required = true, max = 150, regex = VerifyRegexEnum.EMAIL) String email,String checkCode, @VerifyParam(required = true, max = 1, min = 1) Integer type){
 		String code = (String) session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL);
 		try{
-			if(checkCode.equals(code)){
+			if(checkCode.equalsIgnoreCase(code)){
 				emailCodeService.sendEmailCode(email,type);
 
 				return getSuccessResponseVO(null);
@@ -61,6 +63,50 @@ public class AccountController extends ABaseController{
 		}finally {
 			session.removeAttribute(Constants.CHECK_CODE_KEY_EMAIL);
 		}
+	}
 
+	@PostMapping("/register")
+	@GlobalInterceptor(checkParams = true)
+	public ResponseVO register(HttpSession session, @VerifyParam(required = true) String email, @VerifyParam(required = true) String emailCode, @VerifyParam(required = true) String nickName, @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD, min = 8, max = 10) String password, @VerifyParam(required = true) String checkCode){
+		try{
+			if(checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))){
+				userInfoService.register(email,nickName,password,emailCode);
+
+				return getSuccessResponseVO(null);
+			}else{
+				throw new BusinessException("图片验证码错误");
+			}
+		}finally {
+			session.removeAttribute(Constants.CHECK_CODE_KEY);
+		}
+	}
+
+	@PostMapping("/login")
+	public ResponseVO login(HttpSession session, @VerifyParam(required = true, max = 150, regex = VerifyRegexEnum.EMAIL) String email, @VerifyParam(required = true) String password, @VerifyParam(required = true) String checkCode ){
+		try{
+			if(!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))){
+				throw new BusinessException("图片验证码错误");
+			}
+
+			SessionWebUserDto userDto = userInfoService.login(email, password);
+			session.setAttribute(Constants.SESSION_KEY,userDto);
+			return getSuccessResponseVO(userDto);
+		}finally {
+			session.removeAttribute(Constants.CHECK_CODE_KEY);
+		}
+	}
+
+	@PostMapping("/resetPwd")
+	public ResponseVO resetPwd(HttpSession session, @VerifyParam(required = true, max = 150, regex = VerifyRegexEnum.EMAIL) String email, @VerifyParam(required = true) String password, @VerifyParam(required = true) String checkCode, @VerifyParam(required = true) String emailCode){
+		try{
+			if(!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))){
+				throw new BusinessException("图片验证码错误");
+			}
+
+			userInfoService.resetPwd(email,password,emailCode);
+			return getSuccessResponseVO(null);
+		}finally {
+			session.removeAttribute(Constants.CHECK_CODE_KEY);
+		}
 	}
 }
