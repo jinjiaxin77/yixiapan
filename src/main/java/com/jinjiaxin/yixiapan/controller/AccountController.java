@@ -2,6 +2,7 @@ package com.jinjiaxin.yixiapan.controller;
 
 import com.jinjiaxin.yixiapan.annotation.GlobalInterceptor;
 import com.jinjiaxin.yixiapan.annotation.VerifyParam;
+import com.jinjiaxin.yixiapan.entity.config.AppConfig;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.CreateImageCode;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
@@ -12,18 +13,25 @@ import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.service.UserInfoService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
 /**
  * 用户信息 Controller
  */
 @RestController("userInfoController")
+@Slf4j
 public class AccountController extends ABaseController{
 
 	@Autowired
@@ -31,6 +39,9 @@ public class AccountController extends ABaseController{
 
 	@Autowired
 	private EmailCodeService emailCodeService;
+
+	@Autowired
+	private AppConfig appConfig;
 
 	@GetMapping("/checkCode")
 	public void checkCode(HttpServletResponse response, HttpSession session, Integer type) throws IOException {
@@ -82,6 +93,7 @@ public class AccountController extends ABaseController{
 	}
 
 	@PostMapping("/login")
+	@GlobalInterceptor(checkParams = true)
 	public ResponseVO login(HttpSession session, @VerifyParam(required = true, max = 150, regex = VerifyRegexEnum.EMAIL) String email, @VerifyParam(required = true) String password, @VerifyParam(required = true) String checkCode ){
 		try{
 			if(!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))){
@@ -97,6 +109,7 @@ public class AccountController extends ABaseController{
 	}
 
 	@PostMapping("/resetPwd")
+	@GlobalInterceptor(checkParams = true)
 	public ResponseVO resetPwd(HttpSession session, @VerifyParam(required = true, max = 150, regex = VerifyRegexEnum.EMAIL) String email, @VerifyParam(required = true) String password, @VerifyParam(required = true) String checkCode, @VerifyParam(required = true) String emailCode){
 		try{
 			if(!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))){
@@ -109,4 +122,42 @@ public class AccountController extends ABaseController{
 			session.removeAttribute(Constants.CHECK_CODE_KEY);
 		}
 	}
+
+	@GetMapping("/getAvatar/{userId}")
+	@GlobalInterceptor(checkParams = true)
+	public void getAvatar(HttpServletResponse response, @VerifyParam(required = true) @PathVariable("userId") String userId){
+		String avatarFolderName = Constants.FILE_FOLDER_FILE + Constants.FILE_FOLDER_AVATAR_NAME;
+		File folder = new File(avatarFolderName);
+		if(!folder.exists()){
+			folder.mkdir();
+		}
+		String avatarPath = appConfig.getProjectFolder() + avatarFolderName + userId + Constants.AVATAR_SUFFIX;
+		File file = new File(avatarPath);
+		if(!file.exists()){
+			File defaultAvatar = new File(appConfig.getProjectFolder() + avatarFolderName + Constants.DEFAULT_AVATAR);
+			if(!defaultAvatar.exists()){
+				printNoDefaultImage(response);
+			}
+			avatarPath = appConfig.getProjectFolder() + avatarFolderName + Constants.DEFAULT_AVATAR;
+		}
+		response.setContentType("image/jpg");
+		readFile(response,avatarPath);
+	}
+
+	private void printNoDefaultImage(HttpServletResponse response) {
+		response.setHeader(Constants.CONTENT_TYPE,Constants.CONTENT_TYPE_VALUE);
+		response.setStatus(HttpStatus.OK.value());
+		PrintWriter writer = null;
+		try {
+			writer = response.getWriter();
+			writer.println("请在头像目录下放置默认头像default_avatar.jpg");
+			writer.close();
+		} catch (IOException e) {
+            log.error("无默认图",e);
+        }finally {
+			writer.close();
+		}
+    }
+
+
 }

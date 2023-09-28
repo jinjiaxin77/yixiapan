@@ -29,4 +29,16 @@ public class Constants {
     public static final String TYPE_BOOLEAN = "java.lang.Boolean";
 
     public static final String SESSION_KEY = "session_key";
+
+    public static final String FILE_FOLDER_FILE = "/file/";
+
+    public static final String FILE_FOLDER_AVATAR_NAME = "avatar/";
+
+    public static final String AVATAR_SUFFIX = ".jpg";
+
+    public static final String DEFAULT_AVATAR = "avatar_default.jpg";
+
+    public static final String CONTENT_TYPE = "Content-Type";
+
+    public static final String CONTENT_TYPE_VALUE = "application/json;charset=UTF-8"
 }

@@ -87,7 +87,18 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void resetPwd(String email, String password, String emailCode) {
+        User user = userInfoMapper.selectByEmail(email);
+        if(user == null){
+            throw new BusinessException("该用户不存在");
+        }
 
+        if(!emailCodeService.checkCode(email,emailCode)){
+            throw new BusinessException("邮箱验证码错误");
+        }else{
+            user.setPassword(password);
+            userInfoMapper.update(user);
+        }
     }
 }
