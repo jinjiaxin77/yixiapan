@@ -1,5 +1,7 @@
 package com.jinjiaxin.yixiapan.service.impl;
 
+import com.jinjiaxin.yixiapan.component.RedisComponent;
+import com.jinjiaxin.yixiapan.component.RedisUtils;
 import com.jinjiaxin.yixiapan.entity.config.AppConfig;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
@@ -12,6 +14,7 @@ import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.service.UserInfoService;
 import com.jinjiaxin.yixiapan.utils.StringTools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.ArrayUtils;
@@ -35,6 +38,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Autowired
     private AppConfig appConfig;
+
+    @Autowired
+    private RedisComponent redisComponent;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -80,8 +86,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         Boolean isAdmin = ArrayUtils.contains(appConfig.getAdminEmails().split(","),email);
 
+        //查询文件表
         UserSpaceDto userSpace = new UserSpaceDto(emailUser.getUseSpace(), emailUser.getTotalSpace());
-        //RedisComponent保存userSpace
+        redisComponent.saveUserSpace(emailUser.getUserId(),userSpace);
 
         return new SessionWebUserDto(emailUser.getNickName(),emailUser.getUserId(),emailUser.getQqAvatar(),isAdmin);
     }

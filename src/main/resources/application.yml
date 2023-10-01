@@ -10,7 +10,7 @@ spring:
     favicon:
       enable: false
   datasource:
-    url: jdbc:mysql://localhost:3306/yixiapan?serverTimezone=GMT
+    url: jdbc:mysql://localhost:3306/table?serverTimezone=GMT
     username: root
     password: jjx0924.
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -49,12 +49,13 @@ spring:
           max-idle: 10
           min-idle: 0
       timeout: 2000
+      password: 123456
 logging:
   level:
     root: debug
 
 project:
-  folder: d:/springbootProject/YixiaPan/YixiaPan/
+  folder: D:\Java\Project\springbootProject\YixiaPan\resource
 
 admin:
   emails: 1665353392@qq.com

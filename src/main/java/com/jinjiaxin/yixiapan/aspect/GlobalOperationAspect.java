@@ -117,7 +117,6 @@ public class GlobalOperationAspect {
         }else if( !isEmpty && ((annotation.max()!=-1 && annotation.max() < length) || (annotation.min() != -1 && annotation.min() > length))){
             throw new RuntimeException(String.valueOf(ResponseCodeEnum.CODE_600));
         }else if( !isEmpty && !StringTools.isEmpty(annotation.regex().getRegex()) && !VerifyUtils.verify(annotation.regex(),String.valueOf(value))){
-            log.error("here");
             throw new RuntimeException(String.valueOf(ResponseCodeEnum.CODE_600));
         }
     }

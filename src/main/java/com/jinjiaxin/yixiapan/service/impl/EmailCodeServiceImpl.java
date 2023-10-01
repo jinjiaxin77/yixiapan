@@ -2,8 +2,11 @@ package com.jinjiaxin.yixiapan.service.impl;
 
 import com.jinjiaxin.yixiapan.annotation.GlobalInterceptor;
 import com.jinjiaxin.yixiapan.annotation.VerifyParam;
+import com.jinjiaxin.yixiapan.component.RedisComponent;
+import com.jinjiaxin.yixiapan.component.RedisUtils;
 import com.jinjiaxin.yixiapan.entity.config.AppConfig;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
+import com.jinjiaxin.yixiapan.entity.dto.SysSettingsDto;
 import com.jinjiaxin.yixiapan.entity.enums.VerifyRegexEnum;
 import com.jinjiaxin.yixiapan.entity.pojo.EmailCode;
 import com.jinjiaxin.yixiapan.entity.pojo.User;
@@ -45,6 +48,9 @@ public class EmailCodeServiceImpl implements EmailCodeService {
 
     @Autowired
     private AppConfig appConfig;
+
+    @Autowired
+    private RedisComponent redisComponent;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -91,8 +97,10 @@ public class EmailCodeServiceImpl implements EmailCodeService {
             helper.setFrom(appConfig.getSendUserName());
             helper.setTo(toEmail);
 
-            helper.setSubject("YixiaPan验证码");
-            helper.setText("您的验证码为：" + code);
+            SysSettingsDto sysSettingDto = redisComponent.getSysSettingDto();
+
+            helper.setSubject(sysSettingDto.getRegisterMailTitle());
+            helper.setText(String.format(sysSettingDto.getRegisterEmailContent(), code));
             helper.setSentDate(new Date());
 
             sender.send(message);

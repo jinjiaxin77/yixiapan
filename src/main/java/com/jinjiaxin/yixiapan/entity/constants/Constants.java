@@ -40,5 +40,17 @@ public class Constants {
 
     public static final String CONTENT_TYPE = "Content-Type";
 
-    public static final String CONTENT_TYPE_VALUE = "application/json;charset=UTF-8"
+    public static final String CONTENT_TYPE_VALUE = "application/json;charset=UTF-8";
+
+    public static final String REDIS_KEY_SYS_SETTING = "yixiapan:syssetting:";
+
+    public static final String REDIS_KEY_USER_SPACE_USED = "yixiapan:user:spaceuse:";
+
+    public static final Integer REDIS_KEY_EXPIRES_MINUTE = 60;
+
+    public static final Integer REDIS_KEY_EXPIRES_HOUR = 60 * REDIS_KEY_EXPIRES_MINUTE;
+
+    public static final Integer REDIS_KEY_EXPIRES_DAY = 24 * REDIS_KEY_EXPIRES_HOUR;
+
+    public static final Integer MB = 1024;
 }

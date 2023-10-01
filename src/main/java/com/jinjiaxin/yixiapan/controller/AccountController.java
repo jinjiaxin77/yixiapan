@@ -2,10 +2,12 @@ package com.jinjiaxin.yixiapan.controller;
 
 import com.jinjiaxin.yixiapan.annotation.GlobalInterceptor;
 import com.jinjiaxin.yixiapan.annotation.VerifyParam;
+import com.jinjiaxin.yixiapan.component.RedisComponent;
 import com.jinjiaxin.yixiapan.entity.config.AppConfig;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.CreateImageCode;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
+import com.jinjiaxin.yixiapan.entity.dto.UserSpaceDto;
 import com.jinjiaxin.yixiapan.entity.enums.VerifyRegexEnum;
 import com.jinjiaxin.yixiapan.entity.vo.ResponseVO;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
@@ -42,6 +44,9 @@ public class AccountController extends ABaseController{
 
 	@Autowired
 	private AppConfig appConfig;
+
+	@Autowired
+	private RedisComponent redisComponent;
 
 	@GetMapping("/checkCode")
 	public void checkCode(HttpServletResponse response, HttpSession session, Integer type) throws IOException {
@@ -127,9 +132,9 @@ public class AccountController extends ABaseController{
 	@GlobalInterceptor(checkParams = true)
 	public void getAvatar(HttpServletResponse response, @VerifyParam(required = true) @PathVariable("userId") String userId){
 		String avatarFolderName = Constants.FILE_FOLDER_FILE + Constants.FILE_FOLDER_AVATAR_NAME;
-		File folder = new File(avatarFolderName);
+		File folder = new File(appConfig.getProjectFolder() + avatarFolderName);
 		if(!folder.exists()){
-			folder.mkdir();
+			folder.mkdirs();
 		}
 		String avatarPath = appConfig.getProjectFolder() + avatarFolderName + userId + Constants.AVATAR_SUFFIX;
 		File file = new File(avatarPath);
@@ -158,6 +163,23 @@ public class AccountController extends ABaseController{
 			writer.close();
 		}
     }
+
+	@GetMapping("/getUserInfo")
+	@GlobalInterceptor(checkParams = true)
+	public ResponseVO getUserInfo(HttpSession session){
+		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
+		return getSuccessResponseVO(sessionWebUserDto);
+	}
+
+	@GetMapping("/getUseSpace")
+	@GlobalInterceptor(checkParams = true)
+	public ResponseVO getUseSpace(HttpSession session){
+		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
+
+		UserSpaceDto userSpaceDto = redisComponent.getUserSpaceDto(sessionWebUserDto.getUserId());
+
+		return getSuccessResponseVO(userSpaceDto);
+	}
 
 
 }
