@@ -20,4 +20,10 @@ public interface UserInfoService {
     SessionWebUserDto login(String email, String password);
 
     void resetPwd(String email, String password, String emailCode);
+
+    void updateUserAvatarById(String userId, User user);
+
+    void updateUserPasswordById(String userId, User user);
+
+    SessionWebUserDto qqLogin(String code);
 }

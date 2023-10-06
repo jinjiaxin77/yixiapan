@@ -9,10 +9,12 @@ import com.jinjiaxin.yixiapan.entity.dto.CreateImageCode;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
 import com.jinjiaxin.yixiapan.entity.dto.UserSpaceDto;
 import com.jinjiaxin.yixiapan.entity.enums.VerifyRegexEnum;
+import com.jinjiaxin.yixiapan.entity.pojo.User;
 import com.jinjiaxin.yixiapan.entity.vo.ResponseVO;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.service.UserInfoService;
+import com.jinjiaxin.yixiapan.utils.StringTools;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +25,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -165,14 +172,14 @@ public class AccountController extends ABaseController{
     }
 
 	@GetMapping("/getUserInfo")
-	@GlobalInterceptor(checkParams = true)
+	@GlobalInterceptor(checkParams = true,checkLogin = true)
 	public ResponseVO getUserInfo(HttpSession session){
 		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
 		return getSuccessResponseVO(sessionWebUserDto);
 	}
 
 	@GetMapping("/getUseSpace")
-	@GlobalInterceptor(checkParams = true)
+	@GlobalInterceptor(checkParams = true,checkLogin = true)
 	public ResponseVO getUseSpace(HttpSession session){
 		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
 
@@ -181,5 +188,74 @@ public class AccountController extends ABaseController{
 		return getSuccessResponseVO(userSpaceDto);
 	}
 
+	@PostMapping("/logout")
+	@GlobalInterceptor(checkParams = true)
+	public ResponseVO logout(HttpSession session){
+		session.invalidate();
+		return getSuccessResponseVO(null);
+	}
+
+	@PostMapping("/updateUserAvatar")
+	@GlobalInterceptor(checkParams = true,checkLogin = true)
+	public ResponseVO updateUserAvatar(HttpSession session, MultipartFile avatar){
+		SessionWebUserDto webUserDto = getUserInfoFromSession(session);
+
+		String basePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE;
+		String avatarFolder = basePath + Constants.FILE_FOLDER_AVATAR_NAME;
+		File targetFileFolder = new File(avatarFolder);
+		if(!targetFileFolder.exists()){
+			targetFileFolder.mkdirs();
+		}
+		File targetAvatarFile = new File(targetFileFolder.getPath() + "/" + webUserDto.getUserId() + Constants.AVATAR_SUFFIX);
+
+		try{
+			avatar.transferTo(targetAvatarFile);
+		} catch (IOException e) {
+            log.error("上传头像失败",e);
+        }
+
+		User user = new User();
+		user.setQqAvatar("");
+		userInfoService.updateUserAvatarById(webUserDto.getUserId(),user);
+		webUserDto.setAvatar(null);
+		session.setAttribute(Constants.SESSION_KEY,webUserDto);
+		return getSuccessResponseVO(null);
+    }
+
+	@PostMapping("updatePassword")
+	@GlobalInterceptor(checkParams = true,checkLogin = true)
+	public ResponseVO updatePassword(HttpSession session, @VerifyParam(required = true,max = 18, min = 8, regex = VerifyRegexEnum.PASSWORD) String password){
+		SessionWebUserDto webUserDto = getUserInfoFromSession(session);
+
+		User user = new User();
+		user.setPassword(StringTools.encodeByMd5(password));
+		userInfoService.updateUserPasswordById(webUserDto.getUserId(),user);
+		return getSuccessResponseVO(null);
+	}
+
+	@PostMapping("/qqlogin")
+	@GlobalInterceptor(checkParams = true)
+	public ResponseVO qqLogin(HttpSession session, String callbackUrl) throws UnsupportedEncodingException {
+		String state = StringTools.getRandomNumber(Constants.LENGTH_30);
+		if(!StringTools.isEmpty(callbackUrl)){
+			session.setAttribute(state,callbackUrl);
+		}
+		String url = String.format(appConfig.getQqUrlAuthorization(),appConfig.getQqAppId(), URLEncoder.encode(appConfig.getQqUrlRedirect(),"utf-8"),state);
+
+		return getSuccessResponseVO(url);
+	}
+
+	@PostMapping("/qqlogin/callback")
+	@GlobalInterceptor(checkParams = true)
+	public ResponseVO qqLoginCallBAck(HttpSession session, @VerifyParam(required = true) String code, @VerifyParam(required = true) String state){
+		Map<String,Object> result = new HashMap<>();
+		SessionWebUserDto webUserDto = userInfoService.qqLogin(code);
+		session.setAttribute(Constants.SESSION_KEY,webUserDto);
+
+		result.put("callbackUrl",session.getAttribute(state));
+		result.put("userInfo",webUserDto);
+
+		return getSuccessResponseVO(result);
+	}
 
 }

@@ -25,4 +25,25 @@ public class AppConfig {
     @Value("${admin.emails}")
     private String adminEmails;
 
+    @Value("${qq.app.id}")
+    private String qqAppId;
+
+    @Value("${qq.app.key}")
+    private String qqAppKey;
+
+    @Value("${qq.url.authorization}")
+    private String qqUrlAuthorization;
+
+    @Value("${qq.url.access.token}")
+    private String qqUrlAccessToken;
+
+    @Value("${qq.url.openid}")
+    private String qqUrlOpenId;
+
+    @Value("${qq.url.user.info}")
+    private String qqUrlUserInfo;
+
+    @Value("${qq.url.redirect}")
+    private String qqUrlRedirect;
+
 }

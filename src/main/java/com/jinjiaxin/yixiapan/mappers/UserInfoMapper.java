@@ -66,4 +66,7 @@ public interface UserInfoMapper{
 	 User selectByNickName(@Param("nickName") String nickName);
 
 
+    void updateAvatarById(@Param("userId") String userId, @Param("user") User user);
+
+	void updatePasswordById(@Param("userId") String userId, @Param("user") User user);
 }

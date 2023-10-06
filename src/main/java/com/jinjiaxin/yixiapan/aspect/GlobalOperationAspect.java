@@ -3,11 +3,14 @@ package com.jinjiaxin.yixiapan.aspect;
 import com.jinjiaxin.yixiapan.annotation.GlobalInterceptor;
 import com.jinjiaxin.yixiapan.annotation.VerifyParam;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
+import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
 import com.jinjiaxin.yixiapan.entity.enums.ResponseCodeEnum;
 import com.jinjiaxin.yixiapan.entity.enums.VerifyRegexEnum;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
 import com.jinjiaxin.yixiapan.utils.StringTools;
 import com.jinjiaxin.yixiapan.utils.VerifyUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,6 +19,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -47,8 +52,18 @@ public class GlobalOperationAspect {
 
             if(interceptor == null) return null;
 
+            /**
+             * 校验参数
+             */
             if(interceptor.checkParams()){
                 validateParams(method,arguments);
+            }
+
+            /**
+             * 校验登录
+             */
+            if(interceptor.checkLogin() || interceptor.checkAdmin()){
+                checkLogin(interceptor.checkAdmin());
             }
 
             return null;
@@ -63,6 +78,19 @@ public class GlobalOperationAspect {
             throw new BusinessException(ResponseCodeEnum.CODE_500);
         }
 
+    }
+
+    private void checkLogin(Boolean checkAdmin){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpSession session = request.getSession();
+        SessionWebUserDto userDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+        if(userDto == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
+
+        if(checkAdmin && !userDto.getIsAdmin()){
+            throw new BusinessException(ResponseCodeEnum.CODE_404);
+        }
     }
 
     private void validateParams(Method method, Object[] arguments){

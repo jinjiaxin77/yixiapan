@@ -6,7 +6,13 @@
     </insert>
     <update id="update" parameterType="com.jinjiaxin.yixiapan.entity.pojo.User">
         update user_info
-        set user_id = #{user.userId},nick_name = #{user.nickName},email = #{user.email},qq_open_id = #{user.qqOpenId},qq_avatar = #{user.qqAvatar}, password = #{user.password},regis_time = #{user.regisTime},last_login_time = #{user.lastLoginTime}, status = #{user.status},use_space = #{user.useSpace}, total_space = #{user.totalSpace}
+        set nick_name = #{user.nickName},email = #{user.email},qq_open_id = #{user.qqOpenId},qq_avatar = #{user.qqAvatar}, password = #{user.password},regis_time = #{user.regisTime},last_login_time = #{user.lastLoginTime}, status = #{user.status},use_space = #{user.useSpace}, total_space = #{user.totalSpace} where user_id = #{user.userId}
+    </update>
+    <update id="updateAvatarById">
+        update user_info set qq_avatar = #{user.qqAvatar} where user_id = #{userId}
+    </update>
+    <update id="updatePasswordById">
+        update user_info set password = #{user.password} where user_id = #{userId}
     </update>
     <delete id="deleteByUserId">
         delete from user_info where user_id = #{userId}
