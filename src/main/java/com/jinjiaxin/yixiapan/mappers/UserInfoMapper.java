@@ -69,4 +69,6 @@ public interface UserInfoMapper{
     void updateAvatarById(@Param("userId") String userId, @Param("user") User user);
 
 	void updatePasswordById(@Param("userId") String userId, @Param("user") User user);
+
+    Integer updateUseSpace(@Param("userId") String userId, @Param("useSpace") Long useSpace);
 }

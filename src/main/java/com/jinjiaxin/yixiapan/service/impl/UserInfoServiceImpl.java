@@ -9,6 +9,7 @@ import com.jinjiaxin.yixiapan.entity.dto.UserSpaceDto;
 import com.jinjiaxin.yixiapan.entity.enums.UserStatusEnum;
 import com.jinjiaxin.yixiapan.entity.pojo.User;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
+import com.jinjiaxin.yixiapan.mappers.FileInfoMapper;
 import com.jinjiaxin.yixiapan.mappers.UserInfoMapper;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.service.UserInfoService;
@@ -49,6 +50,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Autowired
     private RedisComponent redisComponent;
+
+    @Autowired
+    private FileInfoMapper fileMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -95,8 +99,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         Boolean isAdmin = ArrayUtils.contains(appConfig.getAdminEmails().split(","),email);
 
-        //查询文件表
-        UserSpaceDto userSpace = new UserSpaceDto(emailUser.getUseSpace(), emailUser.getTotalSpace());
+        Long useSpace = fileMapper.selectUseSpace(emailUser.getUserId());
+        UserSpaceDto userSpace = new UserSpaceDto(useSpace, emailUser.getTotalSpace()*Constants.MB);
         redisComponent.saveUserSpace(emailUser.getUserId(),userSpace);
 
         return new SessionWebUserDto(emailUser.getNickName(),emailUser.getUserId(),emailUser.getQqAvatar(),isAdmin);
@@ -168,8 +172,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         SessionWebUserDto userDto = new SessionWebUserDto(user.getNickName(), user.getUserId(), user.getQqAvatar(),isAdmin);
 
         UserSpaceDto userSpaceDto = new UserSpaceDto();
-        //TODO 获取用户已使用的空间
-        userSpaceDto.setUseSpace(0L);
+        Long useSpace = fileMapper.selectUseSpace(user.getUserId());
+        userSpaceDto.setUseSpace(useSpace);
         userSpaceDto.setTotalSpace(user.getTotalSpace());
         redisComponent.saveUserSpace(user.getUserId(), userSpaceDto);
 

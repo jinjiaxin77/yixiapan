@@ -18,7 +18,7 @@ import java.util.Random;
 
 @NoArgsConstructor
 public class CreateImageCode {
-    private int width = 160;
+    private int width = 120;
 
     private int height = 40;
 

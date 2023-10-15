@@ -14,6 +14,11 @@
     <update id="updatePasswordById">
         update user_info set password = #{user.password} where user_id = #{userId}
     </update>
+    <update id="updateUseSpace">
+        update user_info
+        set use_space = #{useSpace}
+        where user_id = #{userId};
+    </update>
     <delete id="deleteByUserId">
         delete from user_info where user_id = #{userId}
     </delete>

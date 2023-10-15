@@ -179,7 +179,7 @@ public class AccountController extends ABaseController{
 	}
 
 	@GetMapping("/getUseSpace")
-	@GlobalInterceptor(checkParams = true,checkLogin = true)
+	@GlobalInterceptor(checkParams = true, checkLogin = true)
 	public ResponseVO getUseSpace(HttpSession session){
 		SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
 

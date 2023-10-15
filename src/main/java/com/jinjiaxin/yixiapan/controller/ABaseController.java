@@ -2,8 +2,10 @@ package com.jinjiaxin.yixiapan.controller;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
 import com.jinjiaxin.yixiapan.entity.enums.ResponseCodeEnum;
+import com.jinjiaxin.yixiapan.entity.vo.PaginationResultVO;
 import com.jinjiaxin.yixiapan.entity.vo.ResponseVO;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
+import com.jinjiaxin.yixiapan.utils.CopyTools;
 import com.jinjiaxin.yixiapan.utils.StringTools;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -48,6 +50,16 @@ public class ABaseController {
         vo.setInfo(ResponseCodeEnum.CODE_500.getMsg());
         vo.setData(t);
         return vo;
+    }
+
+    protected <S,T> PaginationResultVO<T> convert2PaginationVO(PaginationResultVO<S> result, Class<T> classz){
+        PaginationResultVO<T> resultVO = new PaginationResultVO<>();
+        resultVO.setList(CopyTools.copyList(result.getList(),classz));
+        resultVO.setPageNo(result.getPageNo());
+        resultVO.setPageSize(result.getPageSize());
+        resultVO.setPageTotal(result.getPageTotal());
+        resultVO.setTotalCount(result.getTotalCount());
+        return resultVO;
     }
 
     protected void readFile(HttpServletResponse response, String filePath){

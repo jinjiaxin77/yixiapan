@@ -16,6 +16,8 @@ public class Constants {
 
     public static final Integer LENGTH_15 = 15;
 
+    public static final Integer LENGTH_10 = 10;
+
     public static final Integer LENGTH_20 = 20;
 
     public static final Integer LENGTH_30 = 30;
@@ -38,6 +40,8 @@ public class Constants {
 
     public static final String FILE_FOLDER_AVATAR_NAME = "avatar/";
 
+    public static final String FILE_FOLDER_TEMP = "/temp/";
+
     public static final String AVATAR_SUFFIX = ".jpg";
 
     public static final String DEFAULT_AVATAR = "avatar_default.jpg";
@@ -50,13 +54,15 @@ public class Constants {
 
     public static final String REDIS_KEY_USER_SPACE_USED = "yixiapan:user:spaceuse:";
 
+    public static final String REDIS_KEY_FILE_TEMP_SIZE = "yixiapan:user:file:temp:size:";
+
     public static final Integer REDIS_KEY_EXPIRES_MINUTE = 60;
 
     public static final Integer REDIS_KEY_EXPIRES_HOUR = 60 * REDIS_KEY_EXPIRES_MINUTE;
 
     public static final Integer REDIS_KEY_EXPIRES_DAY = 24 * REDIS_KEY_EXPIRES_HOUR;
 
-    public static final Integer MB = 1024;
+    public static final Long MB = 1024 * 1024L;
 
     public static final String VIEW_OBJ_RESULT_KEY = "result";
 }
