@@ -70,5 +70,5 @@ public interface UserInfoMapper{
 
 	void updatePasswordById(@Param("userId") String userId, @Param("user") User user);
 
-    Integer updateUseSpace(@Param("userId") String userId, @Param("useSpace") Long useSpace);
+    Integer updateUseSpace(@Param("userId") String userId, @Param("useSpace") Long useSpace, @Param("totalSpace") Long totalSpace);
 }

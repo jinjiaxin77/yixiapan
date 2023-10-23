@@ -18,7 +18,7 @@ import java.util.Random;
 
 @NoArgsConstructor
 public class CreateImageCode {
-    private int width = 120;
+    private int width = 160;
 
     private int height = 40;
 
@@ -54,8 +54,8 @@ public class CreateImageCode {
     }
 
     private void createImage(){
-        int fontWidth = width / codeCount;
-        int fontHeight = height - 5;
+        int fontWidth = (width - 50) / codeCount;
+        int fontHeight = height - 25;
         int codeY = height - 8;
 
         buffImg = new BufferedImage(width,height, BufferedImage.TYPE_INT_BGR);
@@ -88,7 +88,7 @@ public class CreateImageCode {
         for(int i = 0; i < codeCount; i++){
             String strRand = str1.substring(i,i+1);
             g.setColor(getRandColor(1,255));
-            g.drawString(strRand,i * fontWidth+3,codeY);
+            g.drawString(strRand,i * (fontWidth+8),codeY);
         }
     }
 

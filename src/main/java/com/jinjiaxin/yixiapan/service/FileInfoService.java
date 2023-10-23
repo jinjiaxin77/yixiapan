@@ -55,4 +55,5 @@ public interface FileInfoService {
 
 	UploadResultDto uploadFile(SessionWebUserDto userDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex, Integer chunks);
 
+    void transferFile(String fileId, SessionWebUserDto userDto);
 }

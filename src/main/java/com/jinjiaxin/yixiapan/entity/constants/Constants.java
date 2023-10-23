@@ -65,4 +65,5 @@ public class Constants {
     public static final Long MB = 1024 * 1024L;
 
     public static final String VIEW_OBJ_RESULT_KEY = "result";
+    public static final Object TS_NAME = "index.ts";
 }

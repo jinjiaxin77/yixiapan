@@ -25,6 +25,11 @@ public class RedisComponent {
         return sysSettingsDto;
     }
 
+    public void saveFileTempSize(String userId, String fileId, Long fileSize){
+        Long fileTempSize = getFileTempSize(userId,fileId);
+        redisUtils.setex(Constants.REDIS_KEY_FILE_TEMP_SIZE + userId + fileId,fileSize + fileTempSize,Constants.REDIS_KEY_EXPIRES_DAY);
+    }
+
     public UserSpaceDto getUserSpaceDto(String userId){
         UserSpaceDto userSpaceDto = (UserSpaceDto) redisUtils.get(Constants.REDIS_KEY_USER_SPACE_USED + userId);
         if(userSpaceDto == null){

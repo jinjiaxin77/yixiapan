@@ -70,7 +70,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new BusinessException("邮箱验证码错误");
         }else{
             String userId = StringTools.getRandomNumber(Constants.LENGTH_15);
-            User user = new User(userId, nickName, email, null, null, StringTools.encodeByMd5(password), new Date(), new Date(), UserStatusEnum.ENABLE.getStatus(), 0l, 100l);
+            User user = new User(userId, nickName, email, null, null, StringTools.encodeByMd5(password), new Date(), new Date(), UserStatusEnum.ENABLE.getStatus(), 0l, redisComponent.getSysSettingDto().getUserInitUserSpace()*Constants.MB);
             userInfoMapper.add(user);
         }
 
@@ -100,7 +100,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Boolean isAdmin = ArrayUtils.contains(appConfig.getAdminEmails().split(","),email);
 
         Long useSpace = fileMapper.selectUseSpace(emailUser.getUserId());
-        UserSpaceDto userSpace = new UserSpaceDto(useSpace, emailUser.getTotalSpace()*Constants.MB);
+        UserSpaceDto userSpace = new UserSpaceDto(useSpace, emailUser.getTotalSpace());
         redisComponent.saveUserSpace(emailUser.getUserId(),userSpace);
 
         return new SessionWebUserDto(emailUser.getNickName(),emailUser.getUserId(),emailUser.getQqAvatar(),isAdmin);

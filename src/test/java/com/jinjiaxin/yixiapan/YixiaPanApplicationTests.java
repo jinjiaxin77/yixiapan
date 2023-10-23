@@ -4,14 +4,19 @@ import com.jinjiaxin.yixiapan.component.RedisComponent;
 import com.jinjiaxin.yixiapan.component.RedisUtils;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.UserSpaceDto;
+import com.jinjiaxin.yixiapan.entity.enums.*;
 import com.jinjiaxin.yixiapan.entity.pojo.EmailCode;
+import com.jinjiaxin.yixiapan.entity.pojo.FileInfo;
 import com.jinjiaxin.yixiapan.mappers.EmailCodeMapper;
+import com.jinjiaxin.yixiapan.mappers.FileInfoMapper;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.utils.StringTools;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Date;
 
 @SpringBootTest
 class YixiaPanApplicationTests {
@@ -21,6 +26,9 @@ class YixiaPanApplicationTests {
 
     @Autowired
     RedisUtils redisUtils;
+
+    @Autowired
+    FileInfoMapper fileInfoMapper;
 
     @Test
     void contextLoads() {
@@ -36,9 +44,13 @@ class YixiaPanApplicationTests {
 //        String newName = fileName.substring(0,index) + "_" + StringTools.getRandomNumber(Constants.LENGTH_5) + fileName.substring(index);
 //        System.out.println(newName);
 
-        UserSpaceDto spaceDto = redisComponent.getUserSpaceDto(userId);
-        System.out.println(spaceDto);
-        System.out.println(spaceDto.getTotalSpace());
+//        UserSpaceDto spaceDto = redisComponent.getUserSpaceDto(userId);
+//        System.out.println(spaceDto);
+//        System.out.println(spaceDto.getTotalSpace());
+
+
+        FileInfo fileInfo = new FileInfo("aaaaa", "bbbbb", "ccccc", "ddddd", 10L, "test", null, "/test", new Date(), new Date(), FileFolderTypeEnum.FILE.getType(), FileCategoryEnums.IMAGE.getCategory(),FileTypeEnum.IMAGE.getType(), FileStatusEnum.TRANSFER.getStatus(), null, FileDelFlagEnums.USING.getFlag());
+        fileInfoMapper.insert(fileInfo);
     }
 
 }

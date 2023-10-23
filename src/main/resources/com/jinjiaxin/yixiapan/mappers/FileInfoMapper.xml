@@ -21,7 +21,42 @@
 
 	<insert id="insert" >
 		insert into file_info
-		values (#{file.fileId},#{file.userId},#{file.fileMd5},#{file.filePid},#{file.fileSize},#{file.fileName},#{file.fileCover},#{file.filePath},#{file.createTime},#{file.lastUpdateTime},#{file.folderType},#{file.fileCategory},#{file.fileType},#{file.status},#{file.recoveryTime},#{file.delFlag});
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="file.fileId != null"> file_id, </if>
+			<if test="file.userId != null"> user_id, </if>
+			<if test="file.fileMd5 != null"> file_md5, </if>
+			<if test="file.filePid != null"> file_pid, </if>
+			<if test="file.fileSize != null"> file_size, </if>
+			<if test="file.fileName != null"> file_name, </if>
+			<if test="file.fileCover != null"> file_cover, </if>
+			<if test="file.filePath != null"> file_path, </if>
+			<if test="file.createTime != null"> create_time, </if>
+			<if test="file.lastUpdateTime != null"> last_update_time, </if>
+			<if test="file.folderType != null"> folder_type, </if>
+			<if test="file.fileCategory != null"> file_category, </if>
+			<if test="file.fileType != null"> file_type, </if>
+			<if test="file.status != null"> status, </if>
+			<if test="file.recoveryTime != null"> recovery_time, </if>
+			<if test="file.delFlag != null"> del_flag, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="file.fileId!=null"> #{file.fileId}, </if>
+			<if test="file.userId!=null"> #{file.userId}, </if>
+			<if test="file.fileMd5!=null"> #{file.fileMd5}, </if>
+			<if test="file.filePid!=null"> #{file.filePid}, </if>
+			<if test="file.fileSize!=null"> #{file.fileSize}, </if>
+			<if test="file.fileName!=null"> #{file.fileName}, </if>
+			<if test="file.fileCover!=null"> #{file.fileCover}, </if>
+			<if test="file.filePath!=null"> #{file.filePath}, </if>
+			<if test="file.createTime!=null"> #{file.createTime}, </if>
+			<if test="file.lastUpdateTime!=null"> #{file.lastUpdateTime}, </if>
+			<if test="file.folderType!=null"> #{file.folderType}, </if>
+			<if test="file.fileCategory!=null"> #{file.fileCategory}, </if>
+			<if test="file.fileType!=null"> #{file.fileType}, </if>
+			<if test="file.status!=null"> #{file.status}, </if>
+			<if test="file.recoveryTime!=null"> #{file.recoveryTime}, </if>
+			<if test="file.delFlag!=null"> #{file.delFlag}, </if>
+		</trim>
 	</insert>
 
 	<!-- 根据FileIdAndUserId修改-->
@@ -74,7 +109,56 @@
  		 where file_id=#{fileId} and user_id=#{userId}
 	</update>
 
-	<!-- 根据FileIdAndUserId删除-->
+    <update id="updateFileByFileUserIdAndOldStatus">
+		update file_info
+		<set>
+			<if test="bean.fileMd5 != null">
+				file_md5 = #{bean.fileMd5},
+			</if>
+			<if test="bean.filePid != null">
+				file_pid = #{bean.filePid},
+			</if>
+			<if test="bean.fileSize != null">
+				file_size = #{bean.fileSize},
+			</if>
+			<if test="bean.fileName != null">
+				file_name = #{bean.fileName},
+			</if>
+			<if test="bean.fileCover != null">
+				file_cover = #{bean.fileCover},
+			</if>
+			<if test="bean.filePath != null">
+				file_path = #{bean.filePath},
+			</if>
+			<if test="bean.createTime != null">
+				create_time = #{bean.createTime},
+			</if>
+			<if test="bean.lastUpdateTime != null">
+				last_update_time = #{bean.lastUpdateTime},
+			</if>
+			<if test="bean.folderType != null">
+				folder_type = #{bean.folderType},
+			</if>
+			<if test="bean.fileCategory != null">
+				file_category = #{bean.fileCategory},
+			</if>
+			<if test="bean.fileType != null">
+				file_type = #{bean.fileType},
+			</if>
+			<if test="bean.status != null">
+				status = #{bean.status},
+			</if>
+			<if test="bean.recoveryTime != null">
+				recovery_time = #{bean.recoveryTime},
+			</if>
+			<if test="bean.delFlag != null">
+				del_flag = #{bean.delFlag},
+			</if>
+		</set>
+		where file_id = #{fileId} and user_id = #{userId} and status = #{oldStatus};
+	</update>
+
+    <!-- 根据FileIdAndUserId删除-->
 	<delete id="deleteByFileIdAndUserId">
 		delete from file_info where file_id=#{fileId} and user_id=#{userId}
 	</delete>
@@ -90,7 +174,7 @@
 	</select>
 
 	<select id="selectCountByParams" resultType="java.lang.Integer">
-		select count(*) from file_info where file_pid = #{file.filePid} and user_id = #{file.userId} and user_name = #{file.fileName} and del_flag = #{file.delFlag}
+		select count(*) from file_info where file_pid = #{file.filePid} and user_id = #{file.userId} and file_name = #{file.fileName} and del_flag = #{file.delFlag}
 	</select>
 
 </mapper>

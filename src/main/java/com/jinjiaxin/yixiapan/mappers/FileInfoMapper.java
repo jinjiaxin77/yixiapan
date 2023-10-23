@@ -38,4 +38,6 @@ public interface FileInfoMapper {
 	Long selectUseSpace(@Param("userId") String userId);
 
 	Integer selectCountByParams(@Param("file") FileInfo fileInfo);
+
+    void updateFileByFileUserIdAndOldStatus(@Param("fileId")String fileId, @Param("userId") String userId, @Param("oldStatus") Integer status, @Param("bean") FileInfo updateInfo);
 }
