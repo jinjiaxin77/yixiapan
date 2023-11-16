@@ -4,19 +4,85 @@
 <mapper namespace="com.jinjiaxin.yixiapan.mappers.FileInfoMapper">
 
 	<select id="selectList" parameterType="com.jinjiaxin.yixiapan.entity.query.FileInfoQuery" resultType="com.jinjiaxin.yixiapan.entity.pojo.FileInfo" >
-		SELECT * FROM file_info
-		<if test="query.orderBy != null">
-			order by ${query.orderBy}
+		SELECT file_id,user_id,file_md5,file_pid,file_size, file_name,file_cover,file_path,create_time,last_update_time, folder_type,file_category,file_type,status,recovery_time, del_flag
+		<if test="file.queryNickName != null and file.queryNickName">
+			,(select nick_name from user_info u where u.user_id = f.user_id) nickName
 		</if>
-		<if test="query.fileMd5 != null">
-			where file_md5 = #{query.fileMd5}
+		FROM file_info f
+		<where>
+		<if test="file.fileId != null and file.fileId!='' "> and file_id = #{file.fileId} </if>
+		<if test="file.userId != null and file.userId!=''"> and user_id = #{file.userId} </if>
+		<if test="file.fileMd5 != null and file.fileMd5!=''"> and file_md5 = #{file.fileMd5} </if>
+		<if test="file.filePid != null and file.filePid!=''"> and file_pid = #{file.filePid} </if>
+		<if test="file.fileSize != null"> and file_size = #{file.fileSize} </if>
+		<if test="file.fileName != null and file.fileName!=''"> and file_name = #{file.fileName} </if>
+		<if test="file.fileCover != null and file.fileCover!=''"> and file_cover = #{file.fileCover} </if>
+		<if test="file.filePath != null and file.filePath!=''"> and file_path = #{file.filePath} </if>
+		<if test="file.createTime != null and file.createTime!=''">
+			<![CDATA[ and create_time=str_to_date(#{file.createTime}, '%Y-%m-%d') ]]>
 		</if>
-		limit ${query.simplePage.start},${query.simplePage.end}
+		<if test="file.lastUpdateTime != null and file.lastUpdateTime!=''">
+			<![CDATA[ and last_update_time=str_to_date(#{file.lastUpdateTime}, '%Y-%m-%d') ]]>
+		</if>
+		<if test="file.folderType != null"> and folder_type = #{file.folderType} </if>
+		<if test="file.fileCategory != null"> and file_category = #{file.fileCategory} </if>
+		<if test="file.fileType != null"> and file_type = #{file.fileType} </if>
+		<if test="file.status != null"> and status = #{file.status} </if>
+		<if test="file.delFlag != null"> and del_flag = #{file.delFlag} </if>
+		<if test="file.recoveryTime != null and query.recoveryTime!=''">
+			<![CDATA[ and recovery_time=str_to_date(#{file.recoveryTime}, '%Y-%m-%d') ]]>
+		</if>
+		<if test="file.fileIdArray != null and file.fileIdArray.length > 0">
+			and file_id in (<foreach collection="file.fileIdArray" item="item" separator=",">#{item}</foreach>)
+		</if>
+		<if test="file.excludeFileIdArray != null and file.excludeFileIdArray.length > 0">
+			and file_id not in (<foreach collection="file.excludeFileIdArray" item="item" separator=",">#{item}</foreach>)
+		</if>
+		<if test="file.queryExpire != null and file.queryExpire">
+			<![CDATA[ and recover_time < date_sub(now(),interval 10 day) ]]>
+		</if>
+		</where>
+		<if test="file.orderBy != null">
+			order by ${file.orderBy}
+		</if>
+		<if test="file.simplePage != null">
+			limit #{file.simplePage.start},#{file.simplePage.end}
+		</if>
 	</select>
 
 	<!-- 查询数量-->
-	<select id="selectCount" resultType="java.lang.Integer" >
-		SELECT count(1) FROM file_info
+	<select id="selectCount" resultType="java.lang.Integer" parameterType="com.jinjiaxin.yixiapan.entity.query.FileInfoQuery">
+		SELECT count(*) FROM file_info
+		<where>
+		<if test="file.fileId != null and file.fileId!=''"> and file_id = #{file.fileId} </if>
+		<if test="file.userId != null and file.userId!=''"> and user_id = #{file.userId} </if>
+		<if test="file.fileMd5 != null and file.fileMd5!=''"> and file_md5 = #{file.fileMd5} </if>
+		<if test="file.filePid != null and file.filePid!=''"> and file_pid = #{file.filePid} </if>
+		<if test="file.fileSize != null"> and file_size = #{file.fileSize} </if>
+		<if test="file.fileName != null and file.fileName!=''"> and file_name = #{file.fileName} </if>
+		<if test="file.fileCover != null and file.fileCover!=''"> and file_cover = #{file.fileCover} </if>
+		<if test="file.filePath != null and file.filePath!=''"> and file_path = #{file.filePath} </if>
+		<if test="file.createTime != null and file.createTime!=''">
+			<![CDATA[ and create_time=str_to_date(#{file.createTime}, '%Y-%m-%d') ]]>
+		</if>
+		<if test="file.lastUpdateTime != null and file.lastUpdateTime!=''">
+			<![CDATA[ and last_update_time=str_to_date(#{file.lastUpdateTime}, '%Y-%m-%d') ]]>
+		</if>
+		<if test="file.folderType != null"> and folder_type = #{file.folderType} </if>
+		<if test="file.fileCategory != null"> and file_category = #{file.fileCategory} </if>
+		<if test="file.fileType != null"> and file_type = #{file.fileType} </if>
+		<if test="file.status != null"> and status = #{file.status} </if>
+		<if test="file.delFlag != null"> and del_flag = #{file.delFlag} </if>
+		<if test="file.recoveryTime != null and query.recoveryTime!=''">
+			<![CDATA[ and recovery_time=str_to_date(#{file.recoveryTime}, '%Y-%m-%d') ]]>
+		</if>
+		<if test="file.fileIdArray != null and file.fileIdArray.length > 0">
+			and file_id in (<foreach collection="file.fileIdArray" item="item" separator=",">#{item}</foreach>)
+		</if>
+		<if test="file.queryExpire != null and file.queryExpire">
+			<![CDATA[ and recover_time < date_sub(now(),interval 10 day) ]]>
+		</if>
+		</where>
 	</select>
 
 	<insert id="insert" >
@@ -57,6 +123,11 @@
 			<if test="file.recoveryTime!=null"> #{file.recoveryTime}, </if>
 			<if test="file.delFlag!=null"> #{file.delFlag}, </if>
 		</trim>
+	</insert>
+
+	<insert id="insertBatch" parameterType="com.jinjiaxin.yixiapan.entity.pojo.FileInfo">
+		INSERT INTO file_info( file_id, user_id, file_md5, file_pid, file_size, file_name, file_cover, file_path, create_time, last_update_time, folder_type, file_category, file_type, status, recovery_time, del_flag )values
+		<foreach collection="list" item="item" separator=","> ( #{item.fileId}, #{item.userId}, #{item.fileMd5}, #{item.filePid}, #{item.fileSize}, #{item.fileName}, #{item.fileCover}, #{item.filePath}, #{item.createTime}, #{item.lastUpdateTime}, #{item.folderType}, #{item.fileCategory}, #{item.fileType}, #{item.status}, #{item.recoveryTime}, #{item.delFlag} ) </foreach>
 	</insert>
 
 	<!-- 根据FileIdAndUserId修改-->
@@ -158,12 +229,89 @@
 		where file_id = #{fileId} and user_id = #{userId} and status = #{oldStatus};
 	</update>
 
-    <!-- 根据FileIdAndUserId删除-->
+	<update id="updateFileDelFlagBatch" parameterType="com.jinjiaxin.yixiapan.entity.pojo.FileInfo">
+		update file_info
+		<set>
+			<if test="bean.fileMd5 != null">
+				file_md5 = #{bean.fileMd5},
+			</if>
+			<if test="bean.filePid != null">
+				file_pid = #{bean.filePid},
+			</if>
+			<if test="bean.fileSize != null">
+				file_size = #{bean.fileSize},
+			</if>
+			<if test="bean.fileName != null">
+				file_name = #{bean.fileName},
+			</if>
+			<if test="bean.fileCover != null">
+				file_cover = #{bean.fileCover},
+			</if>
+			<if test="bean.filePath != null">
+				file_path = #{bean.filePath},
+			</if>
+			<if test="bean.createTime != null">
+				create_time = #{bean.createTime},
+			</if>
+			<if test="bean.lastUpdateTime != null">
+				last_update_time = #{bean.lastUpdateTime},
+			</if>
+			<if test="bean.folderType != null">
+				folder_type = #{bean.folderType},
+			</if>
+			<if test="bean.fileCategory != null">
+				file_category = #{bean.fileCategory},
+			</if>
+			<if test="bean.fileType != null">
+				file_type = #{bean.fileType},
+			</if>
+			<if test="bean.status != null">
+				status = #{bean.status},
+			</if>
+			<if test="bean.recoveryTime != null">
+				recovery_time = #{bean.recoveryTime},
+			</if>
+			<if test="bean.delFlag != null">
+				del_flag = #{bean.delFlag},
+			</if>
+		</set>
+		where user_id = #{userId}
+		<if test="filePidList != null">
+			and file_pid in (<foreach collection="filePidList" separator="," item="item">#{item}</foreach>)
+		</if>
+		<if test="fileIdList != null">
+			and file_id in (<foreach collection="fileIdList" separator="," item="item">#{item}</foreach>)
+		</if>
+		<if test="oldDelFlag != null">
+			and del_flag = #{oldDelFlag}
+		</if>
+	</update>
+
+	<!-- 根据FileIdAndUserId删除-->
 	<delete id="deleteByFileIdAndUserId">
 		delete from file_info where file_id=#{fileId} and user_id=#{userId}
 	</delete>
 
-	<!-- 根据PrimaryKey获取对象-->
+	<delete id="delFileBatch">
+		delete from file_info where user_id = #{userId}
+		<if test="filePidList != null">
+			and file_pid in (<foreach collection="filePidList" separator="," item="item">#{item}</foreach>)
+		</if>
+		<if test="fileIdList != null">
+			and file_id in (<foreach collection="fileIdList" separator="," item="item">#{item}</foreach>)
+		</if>
+		<if test="oldDelFlag != null">
+			and del_flag = #{oldDelFlag}
+		</if>
+	</delete>
+
+    <delete id="deleteAllFileByUserId">
+		delete
+		from file_info
+		where user_id = #{userId};
+	</delete>
+
+    <!-- 根据PrimaryKey获取对象-->
 	<select id="selectByFileIdAndUserId" resultType="com.jinjiaxin.yixiapan.entity.pojo.FileInfo" >
 		select * from file_info where file_id=#{fileId} and user_id=#{userId}
 	</select>

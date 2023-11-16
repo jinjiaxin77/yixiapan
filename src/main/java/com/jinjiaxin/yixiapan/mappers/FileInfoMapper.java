@@ -13,6 +13,8 @@ public interface FileInfoMapper {
 
 	Integer insert(@Param("file") FileInfo param);
 
+	void insertBatch(@Param("list") List<FileInfo> fileInfoList);
+
 	/**
 	 * 根据FileIdAndUserId更新
 	 */
@@ -31,13 +33,19 @@ public interface FileInfoMapper {
 	 FileInfo selectByFileIdAndUserId(@Param("fileId") String fileId,@Param("userId") String userId);
 
 
-    List<FileInfo> selectList(@Param("query")FileInfoQuery query);
+    List<FileInfo> selectList(@Param("file")FileInfoQuery query);
 
-	Integer selectCount(FileInfoQuery fileInfo);
+	Integer selectCount(@Param("file") FileInfoQuery fileInfo);
 
 	Long selectUseSpace(@Param("userId") String userId);
 
 	Integer selectCountByParams(@Param("file") FileInfo fileInfo);
 
     void updateFileByFileUserIdAndOldStatus(@Param("fileId")String fileId, @Param("userId") String userId, @Param("oldStatus") Integer status, @Param("bean") FileInfo updateInfo);
+
+	int updateFileDelFlagBatch(@Param("bean")FileInfo fileInfo, @Param("userId") String userId, @Param("filePidList") List<String> filePidList, @Param("fileIdList") List<String> fileIdList, @Param("oldDelFlag") Integer oldDelFlag);
+
+	void delFileBatch(@Param("userId") String userId, @Param("filePidList") List<String> filePidList, @Param("fileIdList") List<String> fileIdList, @Param("oldDelFlag") Integer oldDelFlag);
+
+    void deleteAllFileByUserId(@Param("userId") String userId);
 }

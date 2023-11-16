@@ -7,6 +7,7 @@ import com.jinjiaxin.yixiapan.entity.dto.UserSpaceDto;
 import com.jinjiaxin.yixiapan.entity.enums.*;
 import com.jinjiaxin.yixiapan.entity.pojo.EmailCode;
 import com.jinjiaxin.yixiapan.entity.pojo.FileInfo;
+import com.jinjiaxin.yixiapan.entity.query.FileInfoQuery;
 import com.jinjiaxin.yixiapan.mappers.EmailCodeMapper;
 import com.jinjiaxin.yixiapan.mappers.FileInfoMapper;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
@@ -33,6 +34,10 @@ class YixiaPanApplicationTests {
     @Test
     void contextLoads() {
         String userId = "qqdyvcnzzxz5vni";
+        FileInfoQuery query = new FileInfoQuery();
+        query.setUserId(userId);
+        query.setFileId("1111");
+        fileInfoMapper.selectList(query);
 //        UserSpaceDto userSpaceDto = new UserSpaceDto(0L, (long) (10*Constants.MB));
 //        System.out.println(userSpaceDto);
 //        redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USED + userId, userSpaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
@@ -49,8 +54,8 @@ class YixiaPanApplicationTests {
 //        System.out.println(spaceDto.getTotalSpace());
 
 
-        FileInfo fileInfo = new FileInfo("aaaaa", "bbbbb", "ccccc", "ddddd", 10L, "test", null, "/test", new Date(), new Date(), FileFolderTypeEnum.FILE.getType(), FileCategoryEnums.IMAGE.getCategory(),FileTypeEnum.IMAGE.getType(), FileStatusEnum.TRANSFER.getStatus(), null, FileDelFlagEnums.USING.getFlag());
-        fileInfoMapper.insert(fileInfo);
+//        FileInfo fileInfo = new FileInfo("aaaaa", "bbbbb", "ccccc", "ddddd", 10L, "test", null, "/test", new Date(), new Date(), FileFolderTypeEnum.FILE.getType(), FileCategoryEnums.IMAGE.getCategory(),FileTypeEnum.IMAGE.getType(), FileStatusEnum.TRANSFER.getStatus(), null, FileDelFlagEnums.USING.getFlag());
+//        fileInfoMapper.insert(fileInfo);
     }
 
 }

@@ -99,7 +99,7 @@ public class EmailCodeServiceImpl implements EmailCodeService {
 
             SysSettingsDto sysSettingDto = redisComponent.getSysSettingDto();
 
-            helper.setSubject(sysSettingDto.getRegisterMailTitle());
+            helper.setSubject(sysSettingDto.getRegisterEmailTitle());
             helper.setText(String.format(sysSettingDto.getRegisterEmailContent(), code));
             helper.setSentDate(new Date());
 

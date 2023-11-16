@@ -88,7 +88,7 @@ public class GlobalOperationAspect {
             throw new BusinessException(ResponseCodeEnum.CODE_901);
         }
 
-        if(checkAdmin && !userDto.getIsAdmin()){
+        if(checkAdmin && !userDto.getAdmin()){
             throw new BusinessException(ResponseCodeEnum.CODE_404);
         }
     }
@@ -138,7 +138,6 @@ public class GlobalOperationAspect {
     private void checkValue(Object value, VerifyParam annotation){
         Boolean isEmpty = value==null;
         Integer length = value==null?0:value.toString().length();
-        log.error(annotation.max() + "," + annotation.min());
 
         if(isEmpty && annotation.required()){
             throw new BusinessException(ResponseCodeEnum.CODE_600);

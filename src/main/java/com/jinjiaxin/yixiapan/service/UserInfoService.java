@@ -3,6 +3,7 @@ package com.jinjiaxin.yixiapan.service;
 import java.util.List;
 
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
+import com.jinjiaxin.yixiapan.entity.pojo.FileInfo;
 import com.jinjiaxin.yixiapan.entity.query.UserInfoQuery;
 import com.jinjiaxin.yixiapan.entity.pojo.User;
 import com.jinjiaxin.yixiapan.entity.vo.PaginationResultVO;
@@ -26,4 +27,16 @@ public interface UserInfoService {
     void updateUserPasswordById(String userId, User user);
 
     SessionWebUserDto qqLogin(String code);
+
+    PaginationResultVO findListByPage(UserInfoQuery userInfoQuery);
+
+    int findCountByParam(UserInfoQuery userInfoQuery);
+
+    List<User> findListByParam(UserInfoQuery userInfoQuery);
+
+    void updateUserStatusById( String userId, Integer status);
+
+    void updateUserSpaceById(String userId, Long changeSpace);
+
+    User getUserByUserId(String userId);
 }

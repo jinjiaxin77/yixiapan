@@ -8,7 +8,7 @@ public enum FileTypeEnum {
 
     VIDEO(FileCategoryEnums.VIDEO,1,new String[]{".mp4",".avi","rmvb","mkv",".mov"},"视频"),
     MUSIC(FileCategoryEnums.MUSIC,2,new String[]{".mp3",".wav",".wma",".mp2",".flac",".midi",".ra",".qpe",".aac",".cda"},"音频"),
-    IMAGE(FileCategoryEnums.IMAGE,3,new String[]{".ipeg",".jpg",".png",".gif",".bmp",".dds",".psd",".pdt",".webp",".xmp",".svg",".tiff"},"图片"),
+    IMAGE(FileCategoryEnums.IMAGE,3,new String[]{".jpeg",".jpg",".png",".gif",".bmp",".dds",".psd",".pdt",".webp",".xmp",".svg",".tiff"},"图片"),
     PDF(FileCategoryEnums.DOC,4,new String[]{".pdf"},"pdf"),
     WORD(FileCategoryEnums.DOC,5,new String[]{".doc",".docx"},"word"),
     EXCEL(FileCategoryEnums.DOC,6,new String[]{".xlsx"},"excel"),

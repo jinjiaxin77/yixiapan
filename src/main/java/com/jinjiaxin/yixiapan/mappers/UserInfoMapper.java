@@ -1,7 +1,11 @@
 package com.jinjiaxin.yixiapan.mappers;
 
 import com.jinjiaxin.yixiapan.entity.pojo.User;
+import com.jinjiaxin.yixiapan.entity.query.UserInfoQuery;
+import com.jinjiaxin.yixiapan.entity.vo.PaginationResultVO;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 用户信息 数据库操作接口
@@ -71,4 +75,10 @@ public interface UserInfoMapper{
 	void updatePasswordById(@Param("userId") String userId, @Param("user") User user);
 
     Integer updateUseSpace(@Param("userId") String userId, @Param("useSpace") Long useSpace, @Param("totalSpace") Long totalSpace);
+
+    void updateByUserId(@Param("userId") String userId, @Param("user") User user);
+
+    List<User> selectList(@Param("query") UserInfoQuery userInfoQuery);
+
+	Integer selectCount(@Param("query") UserInfoQuery userInfoQuery);
 }

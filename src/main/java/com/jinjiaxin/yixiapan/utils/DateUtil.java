@@ -3,6 +3,7 @@ package com.jinjiaxin.yixiapan.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,5 +44,11 @@ public class DateUtil {
             e.printStackTrace();
         }
         return new Date();
+    }
+
+    public static Date getAfterDay(Integer day){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR,day);
+        return calendar.getTime();
     }
 }

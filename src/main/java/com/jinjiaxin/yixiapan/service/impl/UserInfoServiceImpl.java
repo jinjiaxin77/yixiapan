@@ -5,11 +5,19 @@ import com.jinjiaxin.yixiapan.entity.config.AppConfig;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
 import com.jinjiaxin.yixiapan.entity.dto.QQInfoDto;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
+import com.jinjiaxin.yixiapan.entity.dto.SysSettingsDto;
 import com.jinjiaxin.yixiapan.entity.dto.UserSpaceDto;
+import com.jinjiaxin.yixiapan.entity.enums.PageSize;
+import com.jinjiaxin.yixiapan.entity.enums.ResponseCodeEnum;
 import com.jinjiaxin.yixiapan.entity.enums.UserStatusEnum;
+import com.jinjiaxin.yixiapan.entity.pojo.FileInfo;
 import com.jinjiaxin.yixiapan.entity.pojo.User;
+import com.jinjiaxin.yixiapan.entity.query.SimplePage;
+import com.jinjiaxin.yixiapan.entity.query.UserInfoQuery;
+import com.jinjiaxin.yixiapan.entity.vo.PaginationResultVO;
 import com.jinjiaxin.yixiapan.exception.BusinessException;
 import com.jinjiaxin.yixiapan.mappers.FileInfoMapper;
+import com.jinjiaxin.yixiapan.mappers.FileShareMapper;
 import com.jinjiaxin.yixiapan.mappers.UserInfoMapper;
 import com.jinjiaxin.yixiapan.service.EmailCodeService;
 import com.jinjiaxin.yixiapan.service.UserInfoService;
@@ -27,6 +35,7 @@ import org.thymeleaf.util.ArrayUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +63,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Autowired
     private FileInfoMapper fileMapper;
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void register(String email, String nickName, String password, String emailCode) {
@@ -70,7 +80,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new BusinessException("邮箱验证码错误");
         }else{
             String userId = StringTools.getRandomNumber(Constants.LENGTH_15);
-            User user = new User(userId, nickName, email, null, null, StringTools.encodeByMd5(password), new Date(), new Date(), UserStatusEnum.ENABLE.getStatus(), 0l, redisComponent.getSysSettingDto().getUserInitUserSpace()*Constants.MB);
+            User user = new User(userId, nickName, email, null, null, StringTools.encodeByMd5(password), new Date(), new Date(), UserStatusEnum.ENABLE.getStatus(), 0l, redisComponent.getSysSettingDto().getUserInitUseSpace()*Constants.MB);
             userInfoMapper.add(user);
         }
 
@@ -159,7 +169,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setUserId(StringTools.getRandomNumber(Constants.LENGTH_15));
             user.setStatus(UserStatusEnum.ENABLE.getStatus());
             user.setUseSpace(0L);
-            user.setTotalSpace(redisComponent.getSysSettingDto().getUserInitUserSpace()*Constants.MB);
+            user.setTotalSpace(redisComponent.getSysSettingDto().getUserInitUseSpace()*Constants.MB);
             this.userInfoMapper.add(user);
 
             user = userInfoMapper.selectByQqOpenId(qqOpenId);
@@ -179,6 +189,76 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         return userDto;
     }
+
+    @Override
+    public PaginationResultVO findListByPage(UserInfoQuery userInfoQuery) {
+        int count = this.findCountByParam(userInfoQuery);
+        int pageSize = userInfoQuery.getPageSize() == null ? PageSize.SIZE15.getSize() : userInfoQuery.getPageSize();
+
+        SimplePage page = new SimplePage(userInfoQuery.getPageNo(), count, pageSize);
+        userInfoQuery.setSimplePage(page);
+        List<User> list = this.findListByParam(userInfoQuery);
+        PaginationResultVO<User> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+        return result;
+    }
+
+    @Override
+    public int findCountByParam(UserInfoQuery userInfoQuery) {
+        return userInfoMapper.selectCount(userInfoQuery);
+    }
+
+    @Override
+    public List<User> findListByParam(UserInfoQuery userInfoQuery) {
+        return userInfoMapper.selectList(userInfoQuery);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserStatusById( String userId, Integer status) {
+        UserStatusEnum byStatus = UserStatusEnum.getByStatus(status);
+        if(byStatus == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+
+        UserInfoQuery query = new UserInfoQuery();
+        query.setUserId(userId);
+        int count = userInfoMapper.selectCount(query);
+        if(count == 0){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+
+        User user = new User();
+        user.setStatus(status);
+        if(byStatus.equals(UserStatusEnum.DISABLE)){
+            user.setTotalSpace(0L);
+            user.setUseSpace(0L);
+            fileMapper.deleteAllFileByUserId(userId);
+        }else if(byStatus.equals(UserStatusEnum.ENABLE)){
+            user.setTotalSpace(new SysSettingsDto().getUserInitUseSpace() * Constants.MB);
+        }
+
+        userInfoMapper.updateByUserId(userId,user);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserSpaceById(String userId, Long changeSpace) {
+        User user = userInfoMapper.selectByUserId(userId);
+        if(user == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if(user.getStatus().equals(UserStatusEnum.DISABLE.getStatus())){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        userInfoMapper.updateUseSpace(userId,null,changeSpace*Constants.MB);
+        redisComponent.resetUserSpaceUse(userId);
+    }
+
+    @Override
+    public User getUserByUserId(String userId) {
+        return userInfoMapper.selectByUserId(userId);
+    }
+
 
     private String getQQAccessToken(String code){
         String accessToken = null;

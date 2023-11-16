@@ -21,6 +21,6 @@ public class SessionWebUserDto {
 
     private String avatar;
 
-    private Boolean isAdmin;
+    private Boolean admin;
 
 }

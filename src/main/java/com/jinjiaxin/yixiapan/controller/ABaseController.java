@@ -1,5 +1,6 @@
 package com.jinjiaxin.yixiapan.controller;
 import com.jinjiaxin.yixiapan.entity.constants.Constants;
+import com.jinjiaxin.yixiapan.entity.dto.SessionShareDto;
 import com.jinjiaxin.yixiapan.entity.dto.SessionWebUserDto;
 import com.jinjiaxin.yixiapan.entity.enums.ResponseCodeEnum;
 import com.jinjiaxin.yixiapan.entity.vo.PaginationResultVO;
@@ -104,5 +105,10 @@ public class ABaseController {
     protected SessionWebUserDto getUserInfoFromSession(HttpSession session){
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
         return sessionWebUserDto;
+    }
+
+    protected SessionShareDto getShareInfoFromSession(HttpSession session, String shareId){
+        SessionShareDto sessionShareDto = (SessionShareDto) session.getAttribute(Constants.SESSION_SHARE_KEY + shareId);
+        return sessionShareDto;
     }
 }

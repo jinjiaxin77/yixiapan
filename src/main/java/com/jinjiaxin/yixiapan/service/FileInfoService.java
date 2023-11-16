@@ -56,4 +56,20 @@ public interface FileInfoService {
 	UploadResultDto uploadFile(SessionWebUserDto userDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex, Integer chunks);
 
     void transferFile(String fileId, SessionWebUserDto userDto);
+
+    FileInfo newFolder(String filePid, String userId, String folderName);
+
+	FileInfo rename(String userId, String fileId, String fileName);
+
+	void changeFileFolder(String fileIds, String filePid, String userId);
+
+	void removeFile2RecycleBatch(String userId, String fileIds);
+
+	void recoverFileBatch(String userId, String fileIds);
+
+	void delFileBatch(String userId, String fileIds, Boolean adminOp);
+
+	void checkRootFilePid(String rootFilePid, String userId, String fileId);
+
+	void saveShare(String shareRootFilePid, String shareFileIds, String myFolderId, String shareUserId, String currentUserId);
 }
